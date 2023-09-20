@@ -1,0 +1,16 @@
+%INCLU(APGMAQUA.C99-Subroutines);
+
+%let isData = 1 ;
+%let isWKT = 0 ;
+%let isJS = 0 ;
+
+%INCLU(APGMAQUA.C01-CreateTablesWKT);
+%INCLU(APGMAQUA.C02-ExportCommunesWKT);
+%INCLU(APGMAQUA.C03-ExportCodeBEWKT);
+%INCLU(APGMAQUA.C04-ExportZoneBEWKT);
+%INCLU(APGMAQUA.C05-ExportZonageBEWKT);
+%INCLU(APGMAQUA.C06-ExportEPCIWKT);
+%INCLU(APGMAQUA.C07-ExportDepartementWKT);
+%INCLU(APGMAQUA.C08-ExportZoneViergeWKT);
+
+%INCLU(APGMAQUA.C09-ExportFTP);

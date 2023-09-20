@@ -1,0 +1,74 @@
+
+%if &isWKT = 1 %Then ; 	
+
+Proc COUCHEMSH;
+  Ouvre Fichier = 'ACOMMUNES.CommunesMetropoleMercator' IsFondCarte ;
+  SetProjection Coordonnees =  LONGITUDES_LATITUDES ID = 1000 ;
+  Sauver MSH Fichier = 'TEMP.CommunesLL' Replace ; 
+  NoRedraw ;
+Finproc;
+
+Proc COUCHEMSH ;
+  Ouvre fichier = "TEMP.CommunesLL" IsFondCarte ;
+  ExportXY Fichier = "AEXPORTBE.CommunesWKT" WKT ;
+  NoRedraw ;
+Finproc ;
+
+Tab TEMP.Test ;
+  Ouvre AEXPORTBE.CommunesWKT;
+  Declare lon = Integer ;	
+  lon =  Len(WKT);
+Fintab ;
+
+Proc STAT ;
+   Table TEMP.Test ;
+   TabOut TEMP.Test ;
+   Var lon ;
+   Fonctions Max ;
+Finproc ;
+Tab TEMP.Test ;
+  Ouvre TEMP.Test ;
+  Macvar longueur, lon ;
+Fintab ;
+%out Longueur max du WKT : &longueur ;
+%let longueur =  %f(&longueur+120) ;
+
+Tab AEXPORTBE.ExportCommunesWKT ;
+  Ouvre AEXPORTBE.CommunesWKT ;
+  Declare SQL =  varchar(&longueur) ;
+  SQL = 'Insert Into GEO_Communes_WKT(CodeCommune, Polygon) values (\''+ID+'\', ST_PolygonFromText(\''+WKT+'\'));' ; 
+  Keep SQL ;
+Fintab ;
+
+Proc EXPORT ;
+  Table AEXPORTBE.ExportCommunesWKT ;
+  Fichier Extension = 'sql' Librairie = 'AEXPORTBE' Nom = "Export_GEO_COMMUNES_COORDS_WKT" Separateur = 'COMMA' NoHeader ; 
+Finproc ;
+
+%endif ;
+
+%if &isData = 1 %Then ; 	
+
+Tab AEXPORTBE.ExportCommunesData  ;
+  Ouvre ACOMMUNES.CommunesMetropoleMercator ;
+  Declare SQL =  varchar(1000) ;
+  Declare PIA = varchar(20);
+
+  Commune =  Replace(Commune,'\'','\'\'');
+  PIA = Replace(NB_PIA,',','.') ;
+  If (PIA =  '') Then;
+    PIA =  'NULL' ;
+  EndIf ;
+
+  SQL = 'Insert Into GEO_Communes_DATA(CodeCommune, CodeCant, CodeDept, Commune, ZoneBE, CodeBE, TypeZone, NB_PIA) values(\''+CODE_COMM+'\', \''+CODE_CANT+'\',\''+CODE_DEPT+'\' ,\''+COMMUNE+'\',\''+ZONEBE+'\',\''+CODEBE'\', \''+TYPEZONE'\','+PIA+');' ; 
+  
+  Keep SQL ;
+Fintab ;
+
+Proc EXPORT ;
+  Table AEXPORTBE.ExportCommunesData ;
+  Fichier Extension = 'sql' Librairie = 'AEXPORTBE' Nom = "Export_GEO_COMMUNES_DATA" Separateur = 'COMMA' NoHeader ; 
+Finproc ;
+
+%endif ;
+

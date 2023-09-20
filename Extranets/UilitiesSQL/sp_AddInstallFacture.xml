@@ -1,0 +1,34 @@
+<Procedure>
+	<Instruction>
+		INSERT INTO TInstallFacture (RefInstallation,RefClient,NumeroFacture,Montant,DateEmission,DateEcheance,DateReglement,Payer,Redevance,RefInstallUnique,Acompte,TVA196,TVA55,TVA293B,RefFicheAuto,Actif)
+		Values (@RefInstallation, @RefClient, @NumeroFacture, @Montant, @DateEmission, @DateEcheance, NULL, 0, @Redevance, @RefInstallUnique, @AcompteFacture, @TVA196, @TVA55,@TVA293B,NULL,1);\
+		SET @NewRefInstallFacture = LAST_INSERT_ID();\
+		Update TInstallFacture Set Montant = 0, Redevance = 0, TVA196 = 0, TVA55 = 0 Where RefInstallFacture = @NewRefInstallFacture and Montant is null;\
+		INSERT INTO TInstallFactureAttente (RefInstallFacture,AcompteVerse) Values (@NewRefInstallFacture,@AcompteFacture);\
+		INSERT INTO TInstallFactureParam2 (RefInstallFacture,Texte2, Remise, Acompte, MontantRedevance, MontantAssurance,@LVariables) 
+		Values (@NewRefInstallFacture,@Texte2, @Remise, @AcompteFacture, @Redevance, @Assurance,@LValues);\
+		Select @NewRefInstallFacture as ID;
+	</Instruction>
+	<Input>
+		<Parameter Name="RefInstallation" Type="I" />
+		<Parameter Name="RefClient" Type="I" />
+		<Parameter Name="NumeroFacture" Type="VA" />
+		<Parameter Name="Montant" Type="N" />
+		<Parameter Name="DateEmission" Type="DTSTR" />
+		<Parameter Name="DateEcheance" Type="DTSTR" />
+		<Parameter Name="RefInstallUnique" Type="I" />
+		<Parameter Name="AcompteFacture" Type="N" />
+		<Parameter Name="AcompteVerse" Type="N" />
+		<Parameter Name="Redevance" Type="N" />
+		<Parameter Name="TVA196" Type="N" />
+		<Parameter Name="TVA55" Type="N" />
+		<Parameter Name="TVA55" Type="N" />
+		<Parameter Name="TVA293B" Type="B" />
+		<Parameter Name="Texte2" Type="LOG" />
+		<Parameter Name="Remise" Type="N" />
+		<Parameter Name="Redevance" Type="N" />
+		<Parameter Name="Assurance" Type="N" />
+		<Parameter Name="LVariables" Type="NOMVAR" />
+		<Parameter Name="LValues" Type="NOMVAR" />
+	</Input>
+</Procedure>

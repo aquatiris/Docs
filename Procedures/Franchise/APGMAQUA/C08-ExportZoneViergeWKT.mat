@@ -1,0 +1,70 @@
+
+%if &isWKT = 1 %Then ;  
+
+Proc COUCHEMSH;
+  Ouvre Fichier = 'ACOMMUNES.ZoneBE_Vierge' IsFondCarte ;
+  SetProjection Coordonnees =  LONGITUDES_LATITUDES ID = 1000 ;
+  Sauver MSH Fichier = 'TEMP.ZoneViergeLL' Replace ; 
+  NoRedraw ;
+Finproc;
+
+Proc COUCHEMSH ;
+  Ouvre fichier = "TEMP.ZoneViergeLL" IsFondCarte ;
+   SetID Var = 'ZoneBE' ;
+  ExportXY Fichier = "AEXPORTBE.ZoneViergeWKT" WKT ;
+  NoRedraw ;
+Finproc ;
+
+Tab TEMP.Test ;
+  Ouvre AEXPORTBE.ZoneViergeWKT;
+  lon =  Len(WKT);
+Fintab ;
+Proc STAT ;
+   Table TEMP.Test ;
+   TabOut TEMP.Test ;
+   Var lon ;
+   Fonctions Max ;
+Finproc ;
+Tab TEMP.Test ;
+  Ouvre TEMP.Test;
+  MacVar longueur, lon ;
+Fintab ;
+%out Longueur max du WKT : &longueur ;
+%let longueur =  %f(&longueur+120) ;
+
+Tab AEXPORTBE.ExportZoneViergeWKT ;
+  Ouvre AEXPORTBE.ZoneViergeWKT ;
+  Declare SQL =  varchar(&longueur) ;
+  SQL = 'Insert Into GEO_ZoneVierge_WKT(ZoneBE, Polygon) values (\''+ID+'\', ST_PolygonFromText(\''+WKT+'\'));' ; 
+  Keep SQL ;
+Fintab ;
+
+Proc EXPORT ;
+  Table AEXPORTBE.ExportZoneViergeWKT ;
+  Fichier Extension = 'sql' Librairie = 'AEXPORTBE' Nom = "Export_GEO_ZONEVIERGE_COORDS_WKT" Separateur = 'COMMA' NoHeader ; 
+Finproc ;
+
+%endif ;
+%if &isData = 1 %Then ;  
+
+Tab AEXPORTBE.ExportZoneViergeData  ;
+  Ouvre ACOMMUNES.ZoneBE_Vierge ;
+  Declare SQL =  varchar(1000) ;
+  Declare PIA = varchar(20);
+
+  PIA = Replace(NB_PIA,',','.') ;
+  If (PIA =  '') Then;
+    PIA =  'NULL' ;
+  EndIf ;
+
+  SQL = 'Insert Into GEO_ZoneVierge_DATA(ZoneBE, NB_PIA) values(\''+ZoneBE+'\', '+PIA+');' ; 
+  
+  Keep SQL ;
+Fintab ;
+
+Proc EXPORT ;
+  Table AEXPORTBE.ExportZoneViergeData ;
+  Fichier Extension = 'sql' Librairie = 'AEXPORTBE' Nom = "Export_GEO_ZONEVIERGE_DATA" Separateur = 'COMMA' NoHeader ; 
+Finproc ;
+
+%endif ;

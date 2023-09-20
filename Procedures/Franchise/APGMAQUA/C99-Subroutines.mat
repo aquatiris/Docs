@@ -1,0 +1,297 @@
+%Sub ExecuteScriptSQL(sqlliste, libsql, xml ,env, rapport);
+ 
+Tab AEXPORTBE.&xml ;
+  Declare SQL =  varchar(1000) ;
+ SQL = '<?xml version=\'1.0\' encoding=\'UTF-8\' ?>' ;Stock;
+ SQL = '<actions>' ;Stock;
+ SQL = '<user>' ;Stock;
+ SQL = '	<id>slr</id>' ;Stock;
+ SQL = '	<pwd>roseau353567</pwd>' ;Stock;
+ SQL = '</user>' ;Stock;
+ SQL = '<action>SCRIPT_'+"&env"+'</action > ' ;Stock;
+ SQL = '<clearFiles>1</clearFiles>' ;Stock;
+ SQL = '<scripts>' ;Stock;
+
+%let i = 1 ;
+%While %ISEMPTY(%SCAN(&sqlliste,&i," ")) = 0;
+  %Let V = %SCAN(&sqlliste,&i," ") ;
+
+ SQL = '	 <script>'+"&v"+'</script>' ;Stock;
+
+  %Let i = %f(&i+1) ;
+%wend ;
+
+ SQL = '</scripts>' ;Stock;
+ SQL = '</actions>' ;Stock;
+Fintab ;
+
+Proc EXPORT ;
+  Table AEXPORTBE.&xml ;
+  Fichier Extension = 'xml' Librairie = 'AEXPORTBE' Nom = "&xml" Separateur = 'COMMA' NoHeader ; 
+Finproc ;
+
+$Passage des scripts ;
+Proc FTP;
+  Serveur URL = 'ftp.jardins-assainissement.fr' User = 'jardinsaw' Password = 'casquitte35' ;
+  Replace ;
+
+%let i = 1 ;
+%While %ISEMPTY(%SCAN(&sqlliste,&i," ")) = 0;
+  %Let V = %SCAN(&sqlliste,&i," ") ;
+
+  Transfert ServeurPath = '/Recette/FactorNET/save_prod/scripts' Nom = "&v" Librairie = "&libsql" ;
+
+  %Let i = %f(&i+1) ;
+%wend ;
+  Transfert ServeurPath = '/Recette/FactorNET/save_prod/scripts' Nom = "&xml.xml" Librairie = 'AEXPORTBE' ;
+Finproc;
+
+%let url = %f('https://www.recette.factornet.jardins-assainissement.fr/ajax/FactorNET/doExecuteAction.php?actionFile=');
+Proc DOWNLOAD ;
+   URL "&url&xml.xml" ; 
+  FicOut "AEXPORTBE.&rapport&env.json"; 
+Finproc ;
+
+Proc FTP;
+  Serveur URL = 'ftp.jardins-assainissement.fr' User = 'jardinsaw' Password = 'casquitte35' ;
+  Delete ServeurPath = '/Recette/FactorNET/save_prod/scripts' Fichier = "&xml.xml" ;
+Finproc;
+
+%finsub;
+
+%Sub ExecuteScriptExpertSQL(sqlliste, libsql, xml ,env, rapport);
+ 
+Tab AEXPORTBE.&xml ;
+  Declare SQL =  varchar(1000) ;
+ SQL = '<?xml version=\'1.0\' encoding=\'UTF-8\' ?>' ;Stock;
+ SQL = '<actions>' ;Stock;
+ SQL = '<user>' ;Stock;
+ SQL = '	<id>slr</id>' ;Stock;
+ SQL = '	<pwd>roseau353567</pwd>' ;Stock;
+ SQL = '</user>' ;Stock;
+ SQL = '<action>SCRIPT_AQUA_'+"&env"+'</action > ' ;Stock;
+ SQL = '<clearFiles>1</clearFiles>' ;Stock;
+ SQL = '<scripts>' ;Stock;
+
+%let i = 1 ;
+%While %ISEMPTY(%SCAN(&sqlliste,&i," ")) = 0;
+  %Let V = %SCAN(&sqlliste,&i," ") ;
+
+ SQL = '	 <script>'+"&v"+'</script>' ;Stock;
+
+  %Let i = %f(&i+1) ;
+%wend ;
+
+ SQL = '</scripts>' ;Stock;
+ SQL = '</actions>' ;Stock;
+Fintab ;
+
+Proc EXPORT ;
+  Table AEXPORTBE.&xml ;
+  Fichier Extension = 'xml' Librairie = 'AEXPORTBE' Nom = "&xml" Separateur = 'COMMA' NoHeader ; 
+Finproc ;
+
+$Passage des scripts ;
+Proc FTP;
+  Serveur URL = 'ftp.jardins-assainissement.fr' User = 'jardinsaw' Password = 'casquitte35' ;
+  Replace ;
+
+%let i = 1 ;
+%While %ISEMPTY(%SCAN(&sqlliste,&i," ")) = 0;
+  %Let V = %SCAN(&sqlliste,&i," ") ;
+
+  Transfert ServeurPath = '/Recette/FactorNET/save_prod/scripts' Nom = "&v" Librairie = "&libsql" ;
+
+  %Let i = %f(&i+1) ;
+%wend ;
+  Transfert ServeurPath = '/Recette/FactorNET/save_prod/scripts' Nom = "&xml.xml" Librairie = 'AEXPORTBE' ;
+Finproc;
+
+%let url = %f('https://www.recette.factornet.jardins-assainissement.fr/ajax/FactorNET/doExecuteAction.php?actionFile=');
+Proc DOWNLOAD ;
+   URL "&url&xml.xml" ; 
+  FicOut "AEXPORTBE.&rapport&env.json"; 
+Finproc ;
+
+Proc FTP;
+  Serveur URL = 'ftp.jardins-assainissement.fr' User = 'jardinsaw' Password = 'casquitte35' ;
+  Delete ServeurPath = '/Recette/FactorNET/save_prod/scripts' Fichier = "&xml.xml" ;
+Finproc;
+
+%finsub;
+
+%Sub ExecuteScriptAquaSQL(sqlliste, libsql, xml, rapport);
+ 
+Tab AEXPORTBE.&xml ;
+  Declare SQL =  varchar(1000) ;
+ SQL = '<?xml version=\'1.0\' encoding=\'UTF-8\' ?>' ;Stock;
+ SQL = '<actions>' ;Stock;
+ SQL = '<user>' ;Stock;
+ SQL = '	<id>slr</id>' ;Stock;
+ SQL = '	<pwd>roseau353567</pwd>' ;Stock;
+ SQL = '</user>' ;Stock;
+ SQL = '<action>SCRIPT</action > ' ;Stock;
+ SQL = '<clearFiles>1</clearFiles>' ;Stock;
+ SQL = '<scripts>' ;Stock;
+
+%let i = 1 ;
+%While %ISEMPTY(%SCAN(&sqlliste,&i," ")) = 0;
+  %Let V = %SCAN(&sqlliste,&i," ") ;
+
+ SQL = '	 <script>'+"&v"+'</script>' ;Stock;
+
+  %Let i = %f(&i+1) ;
+%wend ;
+
+ SQL = '</scripts>' ;Stock;
+ SQL = '</actions>' ;Stock;
+Fintab ;
+
+Proc EXPORT ;
+  Table AEXPORTBE.&xml ;
+  Fichier Extension = 'xml' Librairie = 'AEXPORTBE' Nom = "&xml" Separateur = 'COMMA' NoHeader ; 
+Finproc ;
+
+$Passage des scripts ;
+Proc FTP;
+  Serveur URL = 'ftp.6tm.aquatiris.fr' User = 'ftp.6tm.aquatiris.fr|usr_6tm' Password = 'FgtXc1vDegPc4' ;
+  Replace ;
+
+%let i = 1 ;
+%While %ISEMPTY(%SCAN(&sqlliste,&i," ")) = 0;
+  %Let V = %SCAN(&sqlliste,&i," ") ;
+
+  Transfert ServeurPath = '/Fichiers/1/Scripts' Nom = "&v" Librairie = "&libsql" ;
+
+  %Let i = %f(&i+1) ;
+%wend ;
+  Transfert ServeurPath = '/Fichiers/1/Scripts' Nom = "&xml.xml" Librairie = 'AEXPORTBE' ;
+Finproc;
+
+%let url = %f('https://service.aquatiris.fr/wsAqua.asmx/actionFile');
+%let action = %f('pId=slr&pKey=roseau353567&pAction=&xml.xml');
+
+Proc DOWNLOAD ;
+   URL "&url" ; 
+   PostData Data = "&action";
+  FicOut "AEXPORTBE.&rapport.json"; 
+Finproc ;
+
+Proc FTP;
+  Serveur URL = 'ftp.6tm.aquatiris.fr' User = 'ftp.6tm.aquatiris.fr|usr_6tm' Password = 'FgtXc1vDegPc4' ;
+  Delete ServeurPath = '/Fichiers/1/Scripts' Fichier = "&xml.xml" ;
+Finproc;
+
+%finsub;
+
+%sub ExportZoneBESQL(zone, tabSource,isExecute,env) ;
+Tab TEMP.AquaCommunes; 
+  Ouvre &tabSource;
+  Declare SQL =  varchar(1000) ;
+
+  SQL = 'Update Aqua_Communes set AdheIdentifiant = '+adheidentifiant+', AdheId2 = \''+adheidentifiant+'\' Where CodeCommune = \''+CODE_COMM+'\' ;' ; 
+  
+  Keep SQL ;
+Fintab ;
+
+Proc EXPORT ;
+  Table TEMP.AquaCommunes ;
+  Fichier Extension = 'sql' Librairie = 'AEXPORTBE' Nom = "Export_SQL_AquaCommunes_&zone" Separateur = 'COMMA' NoHeader ; 
+Finproc ;
+
+Tab TEMP.AquaUpdateCPAdherent; 
+  Declare SQL =  varchar(1000) ;
+  
+  SQL = 'Delete From Aqua_CPAdherent ' ;Stock;
+  SQL = 'GO' ;Stock;
+  SQL = '' ;Stock;
+  SQL = '' ;Stock;
+
+  SQL = 'Insert Into Aqua_CPAdherent(CP, AdheIdentifiant,NbCommunes) ' ;Stock;
+  SQL = 'Select CP, AdheIdentifiant, count(*) as NbCommunes ' ;Stock;
+  SQL = 'From Aqua_Communes ' ;Stock;
+  SQL = 'Group By CP, AdheIdentifiant ' ;Stock;
+  SQL = 'Order by CP, count(*) desc, AdheIdentifiant ' ;Stock;
+  SQL = 'GO ' ;Stock;
+  SQL = '' ;Stock;
+  SQL = '' ;Stock;
+
+  SQL = 'Delete from Aqua_CPAdherent ' ;Stock;
+  SQL = 'Where Exists ( ' ;Stock;
+  SQL = '				Select 1 ' ;Stock;
+  SQL = '				from Aqua_CPAdherent as a ' ;Stock;
+  SQL = '					inner join ( ' ;Stock;
+  SQL = '						Select CP, min(NbCommunes) as Nb From Aqua_CPAdherent ' ;Stock;
+  SQL = '						group by CP ' ;Stock;
+  SQL = '					) as b on b.CP = a.CP and b.Nb = a.NbCommunes ' ;Stock;
+  SQL = '					inner join ( ' ;Stock;
+  SQL = '						Select CP, count(*) as N From Aqua_CPAdherent ' ;Stock;
+  SQL = '						group by CP ' ;Stock;
+  SQL = '					) as c on c.CP = a.CP and c.N > 1 ' ;Stock;
+  SQL = '				where a.ID_CPAdherent = Aqua_CPAdherent.ID_CPAdherent ' ;Stock;	
+  SQL = '			) ' ;Stock;
+  SQL = 'GO' ;Stock;		
+  Keep SQL ;
+Fintab ;
+
+Proc EXPORT ;
+  Table TEMP.AquaUpdateCPAdherent;
+  Fichier Extension = 'sql' Librairie = 'AEXPORTBE' Nom = "Export_SQL_UpdateCPAdherent" Separateur = 'COMMA' NoHeader ; 
+Finproc ;
+
+Tab TEMP.ZonesBE; 
+  Ouvre &tabSource ;
+  Declare SQL =  varchar(1000) ;
+
+  SQL = 'Update ZonesBE set AdheIdentifiant = '+adheidentifiant+',' ;
+  SQL = SQL+' RefBE = '+Cstr(RefBE) ;
+  SQL = SQL+', TypeZone = \''+TypeZone+'\' Where CodeCommune5 = \''+CODE_COMM+'\' ;' ; 
+  
+  Keep SQL ;
+Fintab ;
+
+Proc EXPORT ;
+  Table TEMP.ZonesBE;
+  Fichier Extension = 'sql' Librairie = 'AEXPORTBE' Nom = "Export_SQL_ZonesBE_&zone" Separateur = 'COMMA' NoHeader ; 
+Finproc ;
+
+Tab TEMP.ExpertCity; 
+  Ouvre &tabSource ;
+  Declare SQL =  varchar(1000) ;
+
+  SQL = 'Update lw_expert_city set expert_ref = \''+Cstr(RefBE)+'\',' ;
+  SQL = SQL+' date_modif = now() Where city_insee = \''+CODE_COMM+'\' ;' ; 
+  
+  Keep SQL ;
+Fintab ;
+
+Proc EXPORT ;
+  Table TEMP.ExpertCity;
+  Fichier Extension = 'sql' Librairie = 'AEXPORTBE' Nom = "Export_SQL_Expert_&zone" Separateur = 'COMMA' NoHeader ; 
+Finproc ;
+
+%if &isexecute =  1 %Then ;
+ %Let sqlliste = Export_SQL_ZonesBE_&zone.sql ;
+ %Let xml = ExportXMLZonesBE&zone ;
+ %Let libsql = AEXPORTBE ;
+ %Let rapport = RapportZoneBE_&zone  ;
+
+ %EXECUTESCRIPTSQL(&sqlliste, &libsql, &xml ,&env,&rapport);
+ 
+ %Let sqlliste = Export_SQL_Expert_&zone.sql ;
+ %Let xml = ExportXMLExpert&zone ;
+ %Let libsql = AEXPORTBE ;
+ %Let rapport = RapportExpert_&zone  ;
+
+ %EXECUTESCRIPTEXPERTSQL(&sqlliste, &libsql, &xml ,&env,&rapport);
+ 
+ %Let sqlliste = Export_SQL_AquaCommunes_&zone.sql Export_SQL_UpdateCPAdherent.sql ;
+ %Let xml = ExportXMLAqua&zone ;
+ %Let libsql = AEXPORTBE ;
+ %Let rapport = RapportAqua_&zone  ;
+ 
+ $%ExecuteScriptAquaSQL(&sqlliste, &libsql, &xml, &rapport);
+%endif ;
+
+%finsub;
+

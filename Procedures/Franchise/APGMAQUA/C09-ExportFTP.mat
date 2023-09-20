@@ -1,0 +1,63 @@
+$Copie des fichiers vers le répertoire de travail BDD/geo ;
+Proc COPIE ;
+  Source Librairie = 'AEXPORTBE' ;
+  Select Pattern = 'Export_GEO_*.sql' ;
+  Destination Librairie = 'AEXPORT_BDD_GEO' ;
+  Replace ;
+Finproc ; 
+
+%Let serveur = ftp.jardins-assainissement.fr ;
+
+$Passage des scripts WKT et DATA ;
+Proc FTP;
+  Serveur URL = "&serveur" User = 'jardinsaw' Password = 'casquitte35' ;
+  %if &isWKT = 1 %Then ; Transfert ServeurPath = '/Recette/FactorNET/save_prod/scripts' Pattern = '*_WKT.sql' Librairie = 'AEXPORT_BDD_GEO' Recent; %endif ;
+  %if &isData = 1 %Then ; Transfert ServeurPath = '/Recette/FactorNET/save_prod/scripts' Pattern = '*_DATA.sql' Librairie = 'AEXPORT_BDD_GEO' Recent; %endif ;
+  Transfert ServeurPath = '/Recette/FactorNET/save_prod/scripts' Nom = 'Export_GEO_CREATE_TABLES_WKT.sql' Librairie = 'AEXPORT_BDD_GEO' Recent;
+  Transfert ServeurPath = '/Recette/FactorNET/save_prod/scripts' Nom = 'Export_GEO_LOG.sql' Librairie = 'AEXPORT_BDD_GEO' Recent;
+  Transfert ServeurPath = '/Recette/FactorNET/save_prod/scripts' Nom = 'ExecuteScriptsRecette.xml' Librairie = 'AEXPORT_BDD_GEO' Recent;
+  Transfert ServeurPath = '/Recette/FactorNET/save_prod/scripts' Nom = 'ExecuteScriptsProd.xml' Librairie = 'AEXPORT_BDD_GEO' Recent;
+  Transfert ServeurPath = '/Recette/FactorNET/save_prod/scripts' Nom = 'ExecuteScriptsRecetteData.xml' Librairie = 'AEXPORT_BDD_GEO' Recent;
+  Transfert ServeurPath = '/Recette/FactorNET/save_prod/scripts' Nom = 'ExecuteScriptsProdData.xml' Librairie = 'AEXPORT_BDD_GEO' Recent;
+Finproc;
+
+%if &isJS = 1 %Then ; 	
+$Export des fichiers Javascript ;
+Proc FTP;
+  Serveur URL = "&serveur" User = 'jardinsaw' Password = 'casquitte35' ;
+  Replace ;
+  Transfert ServeurPath = '/Recette/FactorNET/js' Pattern = '*.js' Librairie = 'CARTESAQUA' ;
+  Transfert ServeurPath = '/Recette/InstallNET/js' Pattern = '*.js' Librairie = 'CARTESAQUA' ;
+  Transfert ServeurPath = '/Recette/AquaNET/js' Pattern = '*.js' Librairie = 'CARTESAQUA' ;
+  Transfert ServeurPath = '/FactorNET/js' Pattern = '*.js' Librairie = 'CARTESAQUA' ;
+  Transfert ServeurPath = '/InstallNET/js' Pattern = '*.js' Librairie = 'CARTESAQUA' ;
+  Transfert ServeurPath = '/AquaNET/js' Pattern = '*.js' Librairie = 'CARTESAQUA' ;
+Finproc;
+%endif ;
+
+$Execution des scripts sur la recette et la prod ;
+Proc DOWNLOAD ;
+%if &isWKT = 1 %Then ; 	
+  URL 'https://www.recette.factornet.jardins-assainissement.fr/ajax/FactorNET/doExecuteAction.php?actionFile=ExecuteScriptsRecette.xml' ;
+%endif ;
+%if &isWKT = 0 %Then ; 	
+  URL 'https://www.recette.factornet.jardins-assainissement.fr/ajax/FactorNET/doExecuteAction.php?actionFile=ExecuteScriptsRecetteData.xml' ;
+%endif ;
+  FicOut 'AEXPORT_BDD_GEO.RapportExecutionRecette.json'; 
+Finproc ;
+
+Proc DOWNLOAD ;
+%if &isWKT = 1 %Then ; 	
+  URL 'https://www.recette.factornet.jardins-assainissement.fr/ajax/FactorNET/doExecuteAction.php?actionFile=ExecuteScriptsProd.xml' ;
+%endif ;
+%if &isWKT = 0 %Then ; 
+  URL 'https://www.recette.factornet.jardins-assainissement.fr/ajax/FactorNET/doExecuteAction.php?actionFile=ExecuteScriptsProdData.xml' ;
+%endif ;
+  FicOut 'AEXPORT_BDD_GEO.RapportExecutionProd.json'; 
+Finproc ;
+
+Proc FTP;
+  Serveur URL = "&serveur" User = 'jardinsaw' Password = 'casquitte35' ;
+  Liste ServeurPath = '/Recette/FactorNET/save_prod/scripts' ;
+Finproc;
+

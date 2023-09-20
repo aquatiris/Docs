@@ -1,0 +1,70 @@
+
+%if &isWKT = 1 %Then ;  
+
+Proc COUCHEMSH;
+  Ouvre Fichier = 'ACOMMUNES.ZoneBE' IsFondCarte ;
+  SetProjection Coordonnees =  LONGITUDES_LATITUDES ID = 1000 ;
+  Sauver MSH Fichier = 'TEMP.ZoneBELL' Replace ; 
+  NoRedraw ;
+Finproc;
+
+Proc COUCHEMSH ;
+  Ouvre fichier = "TEMP.ZoneBELL" IsFondCarte ;
+   SetID Var = 'ZoneBE' ;
+  ExportXY Fichier = "AEXPORTBE.ZoneBEWKT" WKT ;
+  NoRedraw ;
+Finproc ;
+
+Tab TEMP.Test ;
+  Ouvre AEXPORTBE.ZoneBEWKT;
+  lon =  Len(WKT);
+Fintab ;
+Proc STAT ;
+   Table TEMP.Test ;
+   TabOut TEMP.Test ;
+   Var lon ;
+   Fonctions Max ;
+Finproc ;
+Tab TEMP.Test ;
+  Ouvre TEMP.Test;
+  MacVar longueur, lon ;
+Fintab ;
+%out Longueur max du WKT : &longueur ;
+%let longueur =  %f(&longueur+120) ;
+
+Tab AEXPORTBE.ExportZoneBEWKT ;
+  Ouvre AEXPORTBE.ZoneBEWKT ;
+  Declare SQL =  varchar(&longueur) ;
+  SQL = 'Insert Into GEO_ZoneBE_WKT(ZoneBE, Polygon) values (\''+ID+'\', ST_PolygonFromText(\''+WKT+'\'));' ; 
+  Keep SQL ;
+Fintab ;
+
+Proc EXPORT ;
+  Table AEXPORTBE.ExportZoneBEWKT ;
+  Fichier Extension = 'sql' Librairie = 'AEXPORTBE' Nom = "Export_GEO_ZONEBE_COORDS_WKT" Separateur = 'COMMA' NoHeader ; 
+Finproc ;
+
+%endif ;
+%if &isData = 1 %Then ;  
+
+Tab AEXPORTBE.ExportZoneBEData  ;
+  Ouvre ACOMMUNES.ZoneBE ;
+  Declare SQL =  varchar(1000) ;
+  Declare PIA = varchar(20);
+
+  PIA = Replace(NB_PIA,',','.') ;
+  If (PIA =  '') Then;
+    PIA =  'NULL' ;
+  EndIf ;
+
+  SQL = 'Insert Into GEO_ZoneBE_DATA(ZoneBE, CodeBE, NB_PIA) values(\''+ZoneBE+'\', \''+CodeBE+'\', '+PIA+');' ; 
+  
+  Keep SQL ;
+Fintab ;
+
+Proc EXPORT ;
+  Table AEXPORTBE.ExportZoneBEData ;
+  Fichier Extension = 'sql' Librairie = 'AEXPORTBE' Nom = "Export_GEO_ZONEBE_DATA" Separateur = 'COMMA' NoHeader ; 
+Finproc ;
+
+%endif ;

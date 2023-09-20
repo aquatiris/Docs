@@ -1,0 +1,75 @@
+
+%if &isWKT = 1 %Then ; 	
+
+Proc COUCHEMSH ;
+  Ouvre fichier = "ACOMMUNES.EPCI_LL" IsFondCarte ;
+  SetID Var = 'EPCI' ;
+  ExportXY Fichier = "AEXPORTBE.EPCIWKT" WKT ;
+  NoRedraw ;
+Finproc ;
+
+Tab TEMP.Test ;
+  Ouvre AEXPORTBE.EPCIWKT;
+  lon =  Len(WKT);
+Fintab ;
+Proc STAT ;
+   Table TEMP.Test ;
+   TabOut TEMP.Test ;
+   Var lon ;
+   Fonctions Max ;
+Finproc ;
+Tab TEMP.Test ;
+  Ouvre TEMP.Test;
+  MacVar longueur, lon ;
+Fintab ;
+%out Longueur max du WKT : &longueur ;
+%let longueur =  %f(&longueur+120) ;
+
+Tab AEXPORTBE.ExportEPCIWKT ;
+  Ouvre AEXPORTBE.EPCIWKT ;
+  Declare SQL =  varchar(&longueur) ;
+  SQL = 'Insert Into GEO_EPCI_WKT(EPCI, Polygon) values (\''+ID+'\', ST_PolygonFromText(\''+WKT+'\'));' ; 
+  Keep SQL ;
+Fintab ;
+
+Proc EXPORT ;
+  Table AEXPORTBE.ExportEPCIWKT ;
+  Fichier Extension = 'sql' Librairie = 'AEXPORTBE' Nom = "Export_GEO_EPCI_COORDS_WKT" Separateur = 'COMMA' NoHeader ; 
+Finproc ;
+
+%endif ;
+%if &isData = 1 %Then ; 	
+
+Tab AEXPORTBE.ExportEPCIData  ;
+  Ouvre ACOMMUNES.EPCI_LL ;
+  Declare SQL =  varchar(1000) ;
+  Declare NB_COMMUNES = varchar(20);
+
+  If (IsEmpty(LIBEPCI) = 1) Then;
+    LIBEPCI =  '' ;
+  Else ;	
+   LIBEPCI =  Replace(LIBEPCI,'\'','\'\'');	
+  EndIf ;
+  If (IsEmpty(NATURE_EPCI) = 1) Then;
+    NATURE_EPCI =  '' ;
+  Else ;	
+   NATURE_EPCI =  Replace(NATURE_EPCI,'\'','\'\'');
+  EndIf ;
+   
+   NB_COMMUNES = Replace(NB_COM,',','.') ;
+
+  If (NB_COMMUNES =  '') Then;
+    NB_COMMUNES =  'NULL' ;
+  EndIf ;
+
+  SQL = 'Insert Into GEO_EPCI_DATA(EPCI, Libelle, Nature, NbCommunes) values(\''+EPCI+'\', \''+LIBEPCI+'\', \''+NATURE_EPCI+'\', '+NB_COMMUNES+');' ; 
+  
+  Keep SQL ;
+Fintab ;
+
+%endif ;
+
+Proc EXPORT ;
+  Table AEXPORTBE.ExportEPCIData ;
+  Fichier Extension = 'sql' Librairie = 'AEXPORTBE' Nom = "Export_GEO_EPCI_DATA" Separateur = 'COMMA' NoHeader ; 
+Finproc ;

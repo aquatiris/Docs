@@ -1,0 +1,8 @@
+Tab TEMP.TestCommunes ;
+  Ouvre ACOMMUNES.CommunesMetropoleMercator ;
+  Where AdheIdentifiant In ('1106','1158','1145') ;
+Fintab ;
+
+%INCLU(APGMAQUA.C99-Subroutines);
+%let zone = all  ;
+%EXPORTZONEBESQL(&zone, TEMP.TestCommunes ,1,PROD);

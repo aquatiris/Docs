@@ -1,0 +1,38 @@
+Proc FTP;
+  Serveur URL = 'ftp.60gp.ovh.net' User = 'migratiof' Password = 'poissy02' ;
+  Liste ServeurPath = '/geo/save_prod' ;
+Finproc;
+
+Proc FTP;
+  Serveur URL = 'ftp.60gp.ovh.net' User = 'migratiof' Password = 'poissy02' ;
+  Replace ;
+
+  CreerDossier ServeurPath = '/geo/save_prod' Nom = 'toto';
+  Transfert ServeurPath = '/geo/save_prod/toto' Pattern = '*_DATA.sql' Librairie = 'AEXPORTBE' Recent ;
+
+  CreerDossier ServeurPath = '/geo/save_prod/toto' Nom = 'titi';
+  Transfert ServeurPath = '/geo/save_prod/toto/titi' Pattern = '*_DATA.sql' Librairie = 'AEXPORTBE';
+Finproc;
+
+Proc FTP;
+  Serveur URL = 'ftp.60gp.ovh.net' User = 'migratiof' Password = 'poissy02' ;
+  Recursive ;
+  Delete ServeurPath = '/geo/save_prod' Dossier = 'toto' ;
+Finproc;
+
+Proc FTP;
+  Serveur URL = 'ftp.60gp.ovh.net' User = 'migratiof' Password = 'poissy02' ;
+  Liste ServeurPath = '/geo/save_prod/toto' ;
+Finproc;
+
+$Gros volume 20Mo ;
+Proc FTP;
+  Serveur URL = 'ftp.60gp.ovh.net' User = 'migratiof' Password = 'poissy02' ;
+  Replace ;
+  Transfert ServeurPath = '/geo/save_prod' Fichier = 'AEXPORTBE.Export_GEO_COMMUNES_COORDS_WKT.sql' ;
+Finproc;
+
+Proc FTP;
+  Serveur URL = 'ftp.60gp.ovh.net' User = 'migratiof' Password = 'poissy02' ;
+  Telecharger ServeurPath = '/geo/save_prod' Librairie = 'TEMP' FileName = 'Export_GEO_COMMUNES_COORDS_WKT.sql' ;
+Finproc;

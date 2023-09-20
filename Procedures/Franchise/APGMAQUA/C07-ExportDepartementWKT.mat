@@ -1,0 +1,58 @@
+
+%if &isWKT = 1 %Then ; 	
+
+Proc COUCHEMSH ;
+  Ouvre fichier = "SOURCES.FranceDepMercatorLL" IsFondCarte ;
+  ExportXY Fichier = "AEXPORTBE.DeptsWKT" WKT ;
+  NoRedraw ;
+Finproc ;
+
+Tab TEMP.Test ;
+  Ouvre AEXPORTBE.DeptsWKT;
+  lon =  Len(WKT);
+Fintab ;
+Proc STAT ;
+   Table TEMP.Test ;
+   TabOut TEMP.Test ;
+   Var lon ;
+   Fonctions Max ;
+Finproc ;
+Tab TEMP.Test ;
+  Ouvre TEMP.Test;
+  MacVar longueur, lon ;
+Fintab ;
+%out Longueur max du WKT : &longueur ;
+%let longueur =  %f(&longueur+120) ;
+
+Tab AEXPORTBE.ExportDeptsWKT ;
+  Ouvre AEXPORTBE.DeptsWKT ;
+  Declare SQL =  varchar(&longueur) ;
+  SQL = 'Insert Into GEO_Departements_WKT(CodeDept, Polygon) values (\''+ID+'\', ST_PolygonFromText(\''+WKT+'\'));' ; 
+  Keep SQL ;
+Fintab ;
+
+Proc EXPORT ;
+  Table AEXPORTBE.ExportDeptsWKT ;
+  Fichier Extension = 'sql' Librairie = 'AEXPORTBE' Nom = "Export_GEO_DEPTS_COORDS_WKT" Separateur = 'COMMA' NoHeader ; 
+Finproc ;
+
+%endif ;
+%if &isData = 1 %Then ; 	
+
+Tab AEXPORTBE.ExportDeptsData  ;
+  Ouvre SOURCES.FranceDepMercatorLL ;
+  Declare SQL =  varchar(1000) ;
+  
+  NOM_DEPT =  Replace(NOM_DEPT,'\'','\'\'');
+
+  SQL = 'Insert Into GEO_Departements_DATA(CodeDept, Nom) values(\''+CODE_DEPT+'\', \''+NOM_DEPT+'\');' ; 
+  
+  Keep SQL ;
+Fintab ;
+
+Proc EXPORT ;
+  Table AEXPORTBE.ExportDeptsData ;
+  Fichier Extension = 'sql' Librairie = 'AEXPORTBE' Nom = "Export_GEO_DEPTS_DATA" Separateur = 'COMMA' NoHeader ; 
+Finproc ;
+
+%endif ;

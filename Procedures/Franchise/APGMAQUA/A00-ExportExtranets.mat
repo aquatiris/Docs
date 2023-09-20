@@ -1,0 +1,211 @@
+Proc COUCHEMSH ;
+  Ouvre Fichier = 'ACOMMUNES.CommunesMetropoleMercator' IsFondCarte  ;
+ Select CARTE ;
+ Where Syntaxe = 'CODEBE <> \'Aucun\'' ;
+  Sauver MSH Fichier = 'ACOMMUNES.CommunesMetropoleMercator_BESeuls' Replace ; 
+Finproc ;  
+
+Proc REGROUPE;
+   FichierMSH Nom = "ACOMMUNES.CommunesMetropoleMercator_BESeuls" ;
+   Groupe Var = 'CODEBE' CreeGroupe ;
+   SaveAs Nom = "ACOMMUNES.CodeBE" VarAggregees = 'TOTAL IMM_EGOUT IMM_FOSSE IMM_AUTRE NB_PIA' Keep = 'REFBE ADHEIDENTIFIANT' SortBy = 'CODEBE' ;
+Finproc;
+
+Proc REGROUPE;
+   FichierMSH Nom = "ACOMMUNES.CommunesMetropoleMercator_BESeuls" ;
+   Groupe Var = 'ZONEBE' CreeGroupe ;
+   SaveAs Nom = "ACOMMUNES.ZoneBE" VarAggregees = 'TOTAL IMM_EGOUT IMM_FOSSE IMM_AUTRE NB_PIA' Keep = 'CODEBE TYPEZONE ZONE CODEBE_ZONE REFBE ADHEIDENTIFIANT' SortBy = 'CODEBE ZONEBE';
+Finproc;
+
+Proc REGROUPE;
+   FichierMSH Nom = "ACOMMUNES.CommunesMetropoleMercator" ;
+   Groupe Var = 'ZONEBE' CreeGroupe ;
+   SaveAs Nom = "ACOMMUNES.ZoneBE_ALL" VarAggregees = 'TOTAL IMM_EGOUT IMM_FOSSE IMM_AUTRE NB_PIA' Keep = 'CODEBE TYPEZONE ZONE ZONEBE CODEBE_ZONE REFBE ADHEIDENTIFIANT' SortBy = 'CODEBE ZONEBE';
+Finproc;
+
+Proc REGROUPE;
+   FichierMSH Nom = "ACOMMUNES.CommunesMetropoleMercator" ;
+   Groupe Var = 'CODEBE_ZONE' CreeGroupe ;
+   SaveAs Nom = "ACOMMUNES.ZonageBE" VarAggregees = 'TOTAL IMM_EGOUT IMM_FOSSE IMM_AUTRE NB_PIA' Keep = 'CODEBE TYPEZONE ZONE ZONEBE CODEBE_ZONE REFBE ADHEIDENTIFIANT' SortBy = 'CODEBE_ZONE ZONEBE';
+Finproc;
+
+Proc COUCHEMSH ;
+  Ouvre Fichier = 'ACOMMUNES.CommunesMetropoleMercator' IsFondCarte  ;
+ Select CARTE ;
+ Where Syntaxe = 'CODEBE = \'Aucun\'' ;
+  Sauver MSH Fichier = 'ACOMMUNES.CommunesMetropoleMercator_Vierge' Replace ; 
+Finproc ;  
+
+Proc REGROUPE;
+   FichierMSH Nom = "ACOMMUNES.CommunesMetropoleMercator_Vierge" ;
+   Groupe Var = 'ZONEBE' CreeGroupe ;
+   SaveAs Nom = "ACOMMUNES.ZoneBE_Vierge" VarAggregees = 'TOTAL IMM_EGOUT IMM_FOSSE IMM_AUTRE NB_PIA' Keep = 'CODEBE TYPEZONE ZONE ZONEBE CODEBE_ZONE REFBE ADHEIDENTIFIANT' SortBy = 'CODEBE ZONEBE';
+Finproc;
+
+
+$Export vers google maps par CODEBE détail;
+Proc COUCHEMSH;
+  Ouvre Fichier = 'ACOMMUNES.CodeBE' IsFondCarte ;
+  SetProjection Coordonnees =  LONGITUDES_LATITUDES ID = 1000 ;
+  Sauver MSH Fichier = 'ACOMMUNES.CodeBE_LL' Replace ; 
+  NoRedraw ;
+Finproc;
+
+Proc COUCHEMSH;
+  Ouvre Fichier = 'ACOMMUNES.CodeBE_LL' IsFondCarte ;
+  Select CARTE ;
+  SetVarAnalyse Var = 'CODEBE' SchemaCouleurs = MOSAIQUE ;
+  Border Nom =  Black   ; 
+Finproc;
+
+Proc GOOGLEMAPJS;
+   JavaScript NomFonction = 'addBEIGNDetail' NomMap = 'map' NomPolys = 'polysBEIGNDetail' PrefixVars = 'coordsBE' Opacite = 30  ;
+   Datas ListeVars =  'NB_PIA CODEBE REFBE ADHEIDENTIFIANT' NomTableau = 'datasBEDetail' ;
+   SaveAs Nom = 'CARTESAQUA.BEGoogleMaps' ;
+Finproc;
+
+$Export vers google maps par CODEBE;
+Proc COUCHEMSH;
+ Ouvre Fichier = 'ACOMMUNES.CodeBE' IsFondCarte ;
+ Reduction Sortie = 'ACOMMUNES.CodeBE_Reduit' Tolerance = 5000 ;
+ NoRedraw ;
+Finproc;
+
+Proc COUCHEMSH;
+  Ouvre Fichier = 'ACOMMUNES.CodeBE_Reduit' IsFondCarte ;
+  SetProjection Coordonnees =  LONGITUDES_LATITUDES ID = 1000 ;
+  Sauver MSH Fichier = 'ACOMMUNES.CodeBE_Reduit_LL' Replace ; 
+  NoRedraw ;
+Finproc;
+
+Proc COUCHEMSH;
+  Ouvre Fichier = 'ACOMMUNES.CodeBE_Reduit_LL' IsFondCarte ;
+  Select CARTE ;
+  SetVarAnalyse Var = 'CODEBE' SchemaCouleurs = MOSAIQUE ;
+  Border Nom =  Black   ; 
+Finproc;
+
+Proc GOOGLEMAPJS;
+   JavaScript NomFonction = 'addBEIGN' NomMap = 'map' NomPolys = 'polysBEIGN' PrefixVars = 'coordsBE' Opacite = 30  ;
+   Datas ListeVars =  'NB_PIA CODEBE REFBE ADHEIDENTIFIANT' NomTableau = 'datasBE' ;
+   SaveAs Nom = 'CARTESAQUA.BEGoogleMaps_min' ;
+Finproc;
+
+$Export vers google maps par CODEBE_ZONE détail;
+Proc COUCHEMSH;
+  Ouvre Fichier = 'ACOMMUNES.ZonageBE' IsFondCarte ;
+  SetProjection Coordonnees =  LONGITUDES_LATITUDES ID = 1000 ;
+  Sauver MSH Fichier = 'ACOMMUNES.ZonageBE_LL' Replace ; 
+  NoRedraw ;
+Finproc;
+
+Proc COUCHEMSH;
+  Ouvre Fichier = 'ACOMMUNES.ZonageBE_LL' IsFondCarte ;
+  Select CARTE ;
+  SetVarAnalyse Var = 'ZONEBE' SchemaCouleurs = MOSAIQUE ;
+  Border Nom =  Black   ; 
+Finproc;
+
+Proc GOOGLEMAPJS;
+   JavaScript NomFonction = 'addZONEBEIGNDetail' NomMap = 'map' NomPolys = 'polysZONEBEIGNDetail' PrefixVars = 'coordsZONEBE' Opacite = 30  ;
+   Datas ListeVars =  'NB_PIA CODEBE ZONEBE TYPEZONE REFBE ADHEIDENTIFIANT' NomTableau = 'datasZONEBEDetail' ;
+   SaveAs Nom = 'CARTESAQUA.ZONEBEGoogleMaps' ;
+Finproc;
+
+
+$Export vers google maps par CODEBE_ZONE;
+Proc COUCHEMSH;
+ Ouvre Fichier = 'ACOMMUNES.ZonageBE' IsFondCarte ;
+ Reduction Sortie = 'ACOMMUNES.ZonageBE_Reduit' Tolerance = 5000 ;
+ NoRedraw ;
+Finproc;
+
+Proc COUCHEMSH;
+  Ouvre Fichier = 'ACOMMUNES.ZonageBE_Reduit' IsFondCarte ;
+  SetProjection Coordonnees =  LONGITUDES_LATITUDES ID = 1000 ;
+  Sauver MSH Fichier = 'ACOMMUNES.ZonageBE_Reduit_LL' Replace ; 
+  NoRedraw ;
+Finproc;
+
+Proc COUCHEMSH;
+  Ouvre Fichier = 'ACOMMUNES.ZonageBE_Reduit_LL' IsFondCarte ;
+  Select CARTE ;
+  SetVarAnalyse Var = 'ZONEBE' SchemaCouleurs = MOSAIQUE ;
+  Border Nom =  Black   ; 
+Finproc;
+
+Proc GOOGLEMAPJS;
+   JavaScript NomFonction = 'addZONEBEIGN' NomMap = 'map' NomPolys = 'polysZONEBEIGN' PrefixVars = 'coordsZONEBE' Opacite = 30  ;
+   Datas ListeVars =  'NB_PIA CODEBE ZONEBE TYPEZONE REFBE ADHEIDENTIFIANT' NomTableau = 'datasZONEBE' ;
+   SaveAs Nom = 'CARTESAQUA.ZONEBEGoogleMaps_min' ;
+Finproc;
+
+$Export vers google maps par ZONEBE vierges détail;
+Proc COUCHEMSH;
+  Ouvre Fichier = 'ACOMMUNES.ZONEBE_Vierge' IsFondCarte ;
+  SetProjection Coordonnees =  LONGITUDES_LATITUDES ID = 1000 ;
+  Sauver MSH Fichier = 'ACOMMUNES.ZONEBE_Vierge_LL' Replace ; 
+  NoRedraw ;
+Finproc;
+
+Proc COUCHEMSH;
+  Ouvre Fichier = 'ACOMMUNES.ZONEBE_Vierge_LL' IsFondCarte ;
+  Select CARTE ;
+  SetVarAnalyse Var = 'ZONEBE' SchemaCouleurs = MOSAIQUE ;
+  Border Nom =  Black   ; 
+Finproc;
+
+Proc GOOGLEMAPJS;
+   JavaScript NomFonction = 'addZoneViergeIGNDetail' NomMap = 'map' NomPolys = 'polysViergeIGNDetail' PrefixVars = 'coordsVierge' Opacite = 30  ;
+   Datas ListeVars =  'NB_PIA ZONEBE TYPEZONE' NomTableau = 'datasViergeDetail' ;
+   SaveAs Nom = 'CARTESAQUA.ViergeGoogleMaps' ;
+Finproc;
+
+$Export vers google maps par ZONEBE vierges;
+Proc COUCHEMSH;
+ Ouvre Fichier = 'ACOMMUNES.ZONEBE_Vierge' IsFondCarte ;
+ Reduction Sortie = 'ACOMMUNES.ZONEBE_Vierge_Reduit' Tolerance = 5000 ;
+ NoRedraw ;
+Finproc;
+
+Proc COUCHEMSH;
+  Ouvre Fichier = 'ACOMMUNES.ZONEBE_Vierge_Reduit' IsFondCarte ;
+  SetProjection Coordonnees =  LONGITUDES_LATITUDES ID = 1000 ;
+  Sauver MSH Fichier = 'ACOMMUNES.ZONEBE_Vierge_Reduit_LL' Replace ; 
+  NoRedraw ;
+Finproc;
+
+Proc COUCHEMSH;
+  Ouvre Fichier = 'ACOMMUNES.ZONEBE_Vierge_Reduit_LL' IsFondCarte ;
+  Select CARTE ;
+  SetVarAnalyse Var = 'ZONEBE' SchemaCouleurs = MOSAIQUE ;
+  Border Nom =  Black   ; 
+Finproc;
+
+Proc GOOGLEMAPJS;
+   JavaScript NomFonction = 'addZoneViergeIGN' NomMap = 'map' NomPolys = 'polysViergeIGN' PrefixVars = 'coordsVierge' Opacite = 30  ;
+   Datas ListeVars =  'NB_PIA ZONEBE TYPEZONE' NomTableau = 'datasVierge' ;
+   SaveAs Nom = 'CARTESAQUA.ViergeGoogleMaps_min' ;
+Finproc;
+
+Proc COPIE ;
+  FondDeCarte Source = "ACOMMUNES.CommunesMetropoleMercator" Destination = "ABEATRICE.CommunesMetropoleMercator" ;
+ Replace ;
+Finproc ;
+
+Proc COPIE ;
+  FondDeCarte Source = "ACOMMUNES.ZoneBE" Destination = "ABEATRICE.ZoneBE" ;
+ Replace ;
+Finproc ;
+
+Proc COPIE ;
+  FondDeCarte Source = "ACOMMUNES.CodeBE" Destination = "ABEATRICE.CodeBE" ;
+ Replace ;
+Finproc ;
+
+Proc COPIE ;
+  FondDeCarte Source = "ACOMMUNES.ZoneBE_ALL" Destination = "ABEATRICE.ZoneBE_ALL" ;
+ Replace ;
+Finproc ;
+
+%INCLU(APGMAQUA.C00-Automatisation);

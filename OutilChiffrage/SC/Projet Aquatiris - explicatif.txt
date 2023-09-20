@@ -1,0 +1,29 @@
+Le projet a commencé par la création de table et de relations avec les tables déjà existantes au sein de la base de donnée.
+
+- Modélisation de la base de données avec JMerise :
+
+	-MCD (Modèle Conceptuel de données)
+	-MLD (Modèle Logique de données)
+	-Script SQL
+
+Ensuite, pour ce qui est du développement, le but étant d'ajouter un module de chiffrage permettant la création de fiches visant à être configurées de manière à ce que l'on puisse en tirer un chiffrage et ainsi créer des devis.
+
+Pour ça, j'ai fait :
+
+	-Modification des templates de suivi de station afin d'ajouter la partie FicheOutilChiffrage (pour avoir la liste des fiches de la station) -> dans le dossier Template/Station/STATION_EDIT.htm
+	-Ajout d'une classe php : view_FicheOutilChiffrage afin de pouvoir assembler les différents templates concernant la partie FicheOutilChiffrage et permettre l'affichage des variables et la création de boucles.
+	-Ajout d'un contrôleur : doOutilChiffrage.php dans le dossier ajax/FactorNET afin de pouvoir faire pointer les requêtes issues des méthodes Ajax qui traitent de la partie Outil Chiffrage.
+	-Ajout d'un Modèle : FicheOutilChiffrage.php dans le dossier Model afin de regrouper l'ensemble des requêtes à la base de données pour le module Outil Chiffrage.
+	-Ajout d'un fichier Js : FicheOutilChiffrage.js dans js/utils afin de regrouper les fonctions et les actions disponibles pour le module Outil Chiffrage.
+	-Ajout d'un dossier : FicheOutilChiffrage dans le dossier de templates afin de stocker les différents templates qui traitent du module Outil Chiffrage.
+	-Ajout de fichier xml : instructions SQL destinés à être appellées par le Modèle afin de requêter la Base de donnée. 
+	-Ajout de templates dans Template/Station afin d'intégrer le listing des Fiches outil de chiffraage au suivi de station.
+	-Ajout de deux méthodes dans la classe View de station.php afin de gèrer l'affichage des fiches dans la liste.
+	-Modification doStation.php 
+	-Modification Classe Model FicheInstall.php 
+	-Modification fichiers js : Facture.js, Fiche.js, Station.js et FicheSimulation.js (Possible que pour certains les modifications ne soient pas utiles)
+
+Pour le magasin saskit : 
+
+	-Modification du template de mail virement bancaire (affichage des informations bancaires) il s'agit du fichier bankwire.html dans v2/mails/fr/ 
+	
